@@ -13,7 +13,7 @@
  * TODO: refactoring
  *
  * @author Oliver Tacke, Armin Schöning
- * @version 1.2, Feb 2016
+ * @version 1.3, Feb 2016
  */
 
 //import neccessary Classes
@@ -65,9 +65,6 @@ public class TimeTray extends TimerTask implements ActionListener {
 	// Presets for the TrayIcon
 	private Presets presets = null;
 
-	// indicate if the TrayIcon needs repainting
-	private boolean repaint = false;
-
 	/**
 	 * main method
 	 *
@@ -114,15 +111,12 @@ public class TimeTray extends TimerTask implements ActionListener {
 	 * run method
 	 */
 	public void run() {
-		if ( repaint ) {
-            // get current date and set ToolTipText accordingly
-            trayIcon.setToolTip( presets.sdf.format( calendar.getTime() ) );
-
-            // show drawn image
-            trayIcon.setImage( getTrayImage() );
-			
-			this.repaint = false;
-		}
+		// get current date and time and set ToolTipText accordingly
+        calendar = Calendar.getInstance();
+		trayIcon.setToolTip(
+				"week " + 
+				getWeekNumber() + ", " + 
+				presets.sdf.format( calendar.getTime() ) );
 	}
 
 	/**
@@ -148,14 +142,22 @@ public class TimeTray extends TimerTask implements ActionListener {
             g2.setFont( presets.font );
             FontMetrics fm = g2.getFontMetrics( presets.font );
             int fontWidth = fm.stringWidth(
-					String.valueOf( calendar.get( Calendar.WEEK_OF_YEAR ) ) );
+					String.valueOf( getWeekNumber() ) );
             g2.drawString(
-					String.valueOf(
-							calendar.get( Calendar.WEEK_OF_YEAR ) + presets.offset ),
+					String.valueOf( getWeekNumber() ),
 					( iconSize.width-fontWidth ) / 2,
 					iconSize.height - 3 );
 
             return image;
+	}
+	
+	/**
+	 * calculate the current week number
+	 *
+	 * @return int the current week number
+	 */
+	private int getWeekNumber() {
+		return this.calendar.get( Calendar.WEEK_OF_YEAR ) + this.presets.offset;
 	}
 
 	/**
@@ -219,7 +221,7 @@ public class TimeTray extends TimerTask implements ActionListener {
 
 		// default format for displaying date information
 		private static final String DEFAULT_SDF_FORMAT =
-				"'week' w, EEEE, MMMM dd, yyyy, HH:mm";		
+				"EEEE, MMMM dd, yyyy, HH:mm";		
 		
 		// background color for the tray icon
 		private Color backgroundColor;
@@ -336,7 +338,9 @@ public class TimeTray extends TimerTask implements ActionListener {
 		public void stateChanged( ChangeEvent ev ) {
 			JSlider source = (JSlider)ev.getSource();
 			this.parent.presets.offset = source.getValue();
-			this.parent.repaint = true;
+			
+			//update the TrayIcon image
+			this.parent.trayIcon.setImage( getTrayImage() );
 		}
 		
 	}
