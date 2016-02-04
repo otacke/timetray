@@ -60,6 +60,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class TimeTray extends TimerTask implements ActionListener {
+	// version string
+	private final String VERSION = "1.4";
+
 	// TrayIcon to be used in system tray
 	private TrayIcon trayIcon = null;
 
@@ -207,7 +210,7 @@ public class TimeTray extends TimerTask implements ActionListener {
 	 * @return PopUp menu for the TrayIcon
 	 */
 	private PopupMenu createMenu() {
-		PopupMenu menu = new PopupMenu( "TimeTray" );
+		PopupMenu menu = new PopupMenu( "TimeTray " + this.VERSION );
 
 		// about item
 		MenuItem menuSettings = new MenuItem( "Settings" );
