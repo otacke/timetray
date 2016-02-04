@@ -14,6 +14,24 @@ TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I 
 * the tray icon's font
 * an optional offset of -1 or +1 if you're running a locale version of your OS that doesn't match your local calendar customs
 
+So far, there is a rudimental settings window that allows you to change the offset that is saved automatically to a plain text file called .timetray in your home directory. You can edit
+the file with a text editor line by line to change other values. The lines mean...
+
+1. (0-255) red value of the TrayIcon's background color
+2. (0-255) green value of the TrayIcon's background color
+3. (0-255) blue value of the TrayIcon's background color
+4. (0-255) alpha value of the TrayIcon's background color
+5. (0-255) red value of the font color
+6. (0-255) green value of the font color
+7. (0-255) blue value of the font color
+8. (0-255) alpha value of the font color
+9. (-1, 0, 1) time offset
+10. name of the fonf family
+11. number representing the font style (I didn't look up which number means what, but 0 is plain)
+12. simple date format pattern representing the format for the TrayIcons toolstip text
+
+The load and save routines are only rudimentary, so you might crash TimeTray if you set illegal values. In doubt, delete .timetray in your home directory. TimeTray will then reset the file if neccessary.
+
 I might as well play with a wrapper like [launch4j](http://launch4j.sourceforge.net/ "launch4j") to create a Windows native executable that includes a Runtime Environment, but that's not my priority and that would bloat the file massively.. So, you might do that on your own as well ;-)
 
 When will that be done? When it's done.

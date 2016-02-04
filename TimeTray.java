@@ -6,14 +6,15 @@
  * can be obtained by hovering over the symbol with the mouse pointer.
  *
  * TODO: open one presets window only
- * TODO: repaint the TrayIcon when a new week begins
- * TODO: load and save methods for the presets
+ * TODO: positioning of the presets window
  * TODO: color chooser settings
  * TODO: font settings (maybe)
- * TODO: refactoring
+ * TODO: beautify the settings window
+ * TODO: improve or remove the tooltip stuff
+ * TODO: refactoring, e.g. packaging
  *
  * @author Oliver Tacke, Armin Schöning
- * @version 1.3, Feb 2016
+ * @version 1.4, Feb 2016
  */
 
 //import neccessary Classes
@@ -33,6 +34,16 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -49,16 +60,18 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class TimeTray extends TimerTask implements ActionListener {
-
 	// TrayIcon to be used in system tray
-	private TrayIcon trayIcon;
+	private TrayIcon trayIcon = null;
 
 	// dimension of the TrayIcon
-	private Dimension iconSize;
+	private Dimension iconSize = null;
 
 	// internal Java calendar for getting date information
-	private Calendar calendar;
-
+	private Calendar calendar = null;
+	
+	// current week number
+	private int weeknumber = 0;
+	
 	// popupMenu to be used in connection with the TrayIcon
 	private PopupMenu menu = this.createMenu();
 		
@@ -83,13 +96,13 @@ public class TimeTray extends TimerTask implements ActionListener {
 	 * TimeTray Constructor
 	 */
 	public TimeTray()  {
-
 		// retrieve iconSize of SystemTray
 		SystemTray systemTray = SystemTray.getSystemTray();
 		iconSize = systemTray.getTrayIconSize();
 
 		// set presets
 		presets  = new Presets( iconSize.height );
+
 		calendar = Calendar.getInstance();
 
 		// create TrayIcon according to iconSize
@@ -100,7 +113,7 @@ public class TimeTray extends TimerTask implements ActionListener {
             ex.printStackTrace();
 		}
 
-		// run thread and set timer to update every second (if neccessary)
+		// run thread and set timer tooltip to update every second
 		run();
                    
 		Timer timer = new Timer();
@@ -113,10 +126,17 @@ public class TimeTray extends TimerTask implements ActionListener {
 	public void run() {
 		// get current date and time and set ToolTipText accordingly
         calendar = Calendar.getInstance();
+	
 		trayIcon.setToolTip(
 				"week " + 
 				getWeekNumber() + ", " + 
 				presets.sdf.format( calendar.getTime() ) );
+		
+		// The computer might be running when a new week starts...
+		if ( weeknumber != getWeekNumber() ) {
+			weeknumber = getWeekNumber();
+			repaintTrayIcon();
+		}
 	}
 
 	/**
@@ -149,6 +169,10 @@ public class TimeTray extends TimerTask implements ActionListener {
 					iconSize.height - 3 );
 
             return image;
+	}
+
+	private void repaintTrayIcon() {
+		this.trayIcon.setImage( this.getTrayImage() );
 	}
 	
 	/**
@@ -190,9 +214,6 @@ public class TimeTray extends TimerTask implements ActionListener {
 		menuSettings.setActionCommand( "settings" );
 		menu.add( menuSettings );
 
-		// separator
-		menu.addSeparator();
-
 		// exit item
 		MenuItem menuExit = new MenuItem( "Quit" );
 		menuExit.setActionCommand( "quit" );
@@ -209,6 +230,12 @@ public class TimeTray extends TimerTask implements ActionListener {
 	 * TODO: setters/getters
 	 */
 	private class Presets {
+		
+		// path + file name for saving settings in the home directory
+		private final String FILENAME = System.getProperty( "user.home" ) +
+				File.separator +
+				".timetray";
+		
 		// default background color for the tray icon
 		private final Color DEFAULT_BACKGROUND_COLOR =
 				new Color( 221, 221, 221, 0 );
@@ -252,28 +279,95 @@ public class TimeTray extends TimerTask implements ActionListener {
 			final Font DEFAULT_FONT =
 					new Font( "SansSerif", Font.PLAIN, trayHeight );
 			
-			backgroundColor = DEFAULT_BACKGROUND_COLOR;
-			fontColor       = DEFAULT_FONT_COLOR;
+			backgroundColor = this.DEFAULT_BACKGROUND_COLOR;
+			fontColor       = this.DEFAULT_FONT_COLOR;
 			font            = DEFAULT_FONT;
-			offset          = DEFAULT_OFFSET;
-			sdf				= new SimpleDateFormat( DEFAULT_SDF_FORMAT );			
+			offset          = this.DEFAULT_OFFSET;
+			sdf				= new SimpleDateFormat( DEFAULT_SDF_FORMAT );
+			
+			File file = new File( this.FILENAME );
+			if ( file.exists() ) {
+				loadPresets( trayHeight );
+			} else {
+				savePresets();
+			}
+			
 		}
 
 		/**
-		 * Load presets (from a JSON file)
+		 * Load presets
 		 *
-		 * @returns Presets the presets
+		 * This load/save method is very ugly, I know. No beauty and not
+		 * failsafe. It might be replaced by something using JSON, but I want
+		 * to avoid using full blown libraries for a plain settings file.
+		 *
+		 * @param int trayHeight the height of the TrayIcon
 		 */
-		private Presets loadPresets() {
-			return null;
+		private void loadPresets( int trayHeight ) {
+			String line;
+			try (
+				InputStream fis = new FileInputStream( this.FILENAME );
+				InputStreamReader isr = new InputStreamReader(
+						fis,
+						Charset.forName( "UTF-8" ) );
+				BufferedReader br = new BufferedReader( isr );
+			) {
+				int red   = Integer.parseInt( br.readLine() );
+				int green = Integer.parseInt( br.readLine() );
+				int blue  = Integer.parseInt( br.readLine() );
+				int alpha = Integer.parseInt( br.readLine() );
+				this.backgroundColor = new Color ( red, green, blue, alpha );
+				
+				red   = Integer.parseInt( br.readLine() );
+				green = Integer.parseInt( br.readLine() );
+				blue  = Integer.parseInt( br.readLine() );
+				alpha = Integer.parseInt( br.readLine() );
+				this.fontColor = new Color ( red, green, blue, alpha );
+
+				this.offset = Integer.parseInt( br.readLine() );
+				
+				String family = br.readLine();
+				int style     = Integer.parseInt( br.readLine() );
+				this.font = new Font( family, style, trayHeight );
+			
+				this.sdf = new SimpleDateFormat( br.readLine() );
+
+			} catch ( IOException ex ) {
+				ex.printStackTrace();
+			}
 		}
 
 		/**
-		 * Save presets (to a JSON file)
+		 * Save presets
+		 *
+		 * This load/save method is very ugly, I know. No beauty and not
+		 * failsafe. It might be replaced by something using JSON, but I want
+		 * to avoid using full blown libraries for a plain settings file.
 		 */		
 		private void savePresets() {
+			try ( PrintStream out = new PrintStream(
+						new FileOutputStream( this.FILENAME ) ) ) {
+				out.println( this.backgroundColor.getRed() );
+				out.println( this.backgroundColor.getGreen() );
+				out.println( this.backgroundColor.getBlue() );
+				out.println( this.backgroundColor.getAlpha() );
+				
+				out.println( this.fontColor.getRed() );
+				out.println( this.fontColor.getGreen() );
+				out.println( this.fontColor.getBlue() );
+				out.println( this.fontColor.getAlpha() );
+				
+				out.println( this.offset );
+				
+				out.println( this.font.getFamily() );
+				out.println( this.font.getStyle() );
+				
+				out.println( this.sdf.toPattern() );
+				
+			}  catch ( FileNotFoundException ex ) {
+				ex.printStackTrace();
+			}
 		}
-		
 	}
 
 	/**
@@ -293,7 +387,9 @@ public class TimeTray extends TimerTask implements ActionListener {
 		 */		
 		private SettingsWindow( TimeTray parent ) {
 			this.parent = parent;
-			this.getContentPane().setLayout( new BoxLayout( this.getContentPane(), BoxLayout.PAGE_AXIS ) );
+			this.getContentPane().setLayout( new BoxLayout(
+					this.getContentPane(),
+					BoxLayout.PAGE_AXIS ) );
 			this.initWindow();
 		}
 		
@@ -301,14 +397,15 @@ public class TimeTray extends TimerTask implements ActionListener {
 		 * Build the window
 		 */
 		private void initWindow() {
-			JLabel sliderLabel = new JLabel( "Offset (not saved yet)" );
+			JLabel sliderLabel = new JLabel( "Offset" );
 			sliderLabel.setAlignmentX( Component.LEFT_ALIGNMENT );
 			
 			offsetSlider = createOffsetSlider( this );
 
 			this.setTitle( "Presets (not finished)" );
 			this.getContentPane().add( sliderLabel );
-			this.getContentPane().add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+			this.getContentPane().add( Box.createRigidArea(
+					new Dimension( 0, 5 ) ) );
 			this.getContentPane().add( offsetSlider );
 			this.pack();
 		}
@@ -316,11 +413,16 @@ public class TimeTray extends TimerTask implements ActionListener {
 		/**
 		 * Build the slider for setting the offset
 		 *
-		 * @param SettingsWindow window the window that implements the Change Listener
+		 * @param SettingsWindow window the window that implements the Change
+		 *        Listener
 		 * @return JSlider the slider for setting the offset
 		 */		
 		private JSlider createOffsetSlider( SettingsWindow window ) {
-			JSlider offsetSlider = new JSlider( JSlider.HORIZONTAL, -1, 1, window.parent.presets.offset );
+			JSlider offsetSlider = new JSlider(
+					JSlider.HORIZONTAL,
+					-1,
+					1,
+					window.parent.presets.offset );
 			offsetSlider.setAlignmentX( Component.LEFT_ALIGNMENT );
 			offsetSlider.setMajorTickSpacing( 1 );
 			offsetSlider.setPaintTicks( true );
@@ -340,7 +442,10 @@ public class TimeTray extends TimerTask implements ActionListener {
 			this.parent.presets.offset = source.getValue();
 			
 			//update the TrayIcon image
-			this.parent.trayIcon.setImage( getTrayImage() );
+			this.parent.repaintTrayIcon();
+		
+			// save changed presets
+			this.parent.presets.savePresets();
 		}
 		
 	}
