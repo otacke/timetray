@@ -6,6 +6,9 @@ If you don't use the "Download ZIP" option but only want to download TimeTray.ja
 
 Just make sure that you're running a Java Runtime Environment (e. g. the JRE from [Oracle](http://www.java.com/en/download/ "Oracle")), and put TimeTray.jar into your autostart folder, crontab, whatever...
 
+## Screenshot
+![timetray](https://github.com/otacke/timetray/blob/master/timetray.png "timetray")
+
 ## to be done
 TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I don't use Windows. Anyway, allowing to set (and save) some parameters would be useful:
 
