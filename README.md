@@ -37,7 +37,7 @@ The load and save routines are only rudimentary, so you might crash TimeTray if 
 
 I might as well play with a wrapper like [launch4j](http://launch4j.sourceforge.net/ "launch4j") to create a Windows native executable that includes a Runtime Environment, but that's not my priority and that would bloat the file massively.. So, you might do that on your own as well ;-)
 
-When will that be done? When it's done.
+_When will that be done? When it's done. But to be honest: I don't care much about this piece of code that's probably mainly used for Windows. Sorry!_
 
 ## license
 TimeTray is licensed under the DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE.
