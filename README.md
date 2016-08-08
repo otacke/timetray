@@ -1,15 +1,17 @@
-# timetray
-TimeTray is a very simple program that I originally hacked on one day for a former colleague of mine many years ago.
-It displays the calender week in a system tray -- a feature that Windows still lacks in 2016. Since TimeTray is written in Java, it can run on other operating systems as well, e.g. Linux or MacOS.
+# TimeTray
+TimeTray displays the calender week in a system tray -- a feature that Windows still lacks in 2016.
 
-If you don't use the "Download ZIP" option but only want to download TimeTray.jar, don't right-click it in the list (!) but left-click on it and get the "RAW" version!
+## Install/Usage
+If you don't use the "Download ZIP" option but only want to download _TimeTray.jar_, **don't right-click it in the list (!) but left-click on it and get the "RAW" version**!
 
-Just make sure that you're running a Java Runtime Environment (e. g. the JRE from [Oracle](http://www.java.com/en/download/ "Oracle")), and put TimeTray.jar into your autostart folder, crontab, whatever...
+Just make sure that you're running a Java Runtime Environment (e. g. the [JRE from Oracle](http://www.java.com/en/download/ "Oracle")), and put _TimeTray.jar_ into your autostart folder, crontab, whatever...
 
-## screenshot
+## Screenshot
 ![timetray](https://github.com/otacke/timetray/blob/master/timetray.png "timetray")
 
-## to be done
+## Additional Information
+TimeTray is a very simple program that I originally hacked on one day for a former colleague of mine many years ago. It displays the calender week in a system tray -- a feature that Windows still lacks in 2016. Since TimeTray is written in Java, it can run on other operating systems as well, e.g. Linux or MacOS.
+
 TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I don't use Windows. Anyway, allowing to set (and save) some parameters would be useful:
 
 * the tray icon's background color
@@ -17,8 +19,7 @@ TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I 
 * the tray icon's font
 * an optional offset of -1 or +1 if you're running a locale version of your OS that doesn't match your local calendar customs
 
-So far, there is a rudimental settings window that allows you to change the offset that is saved automatically to a plain text file called .timetray in your home directory. You can edit
-the file with a text editor line by line to change other values. The lines mean...
+So far, there is a rudimental settings window that allows you to change the offset that is saved automatically to a plain text file called _.timetray_ in your home directory. You can edit the file with a text editor line by line to change other values. The lines mean...
 
 1. (0-255) red value of the TrayIcon's background color
 2. (0-255) green value of the TrayIcon's background color
@@ -29,15 +30,13 @@ the file with a text editor line by line to change other values. The lines mean.
 7. (0-255) blue value of the font color
 8. (0-255) alpha value of the font color
 9. (-1, 0, 1) time offset
-10. name of the fonf family
+10. name of the font family
 11. number representing the font style (I didn't look up which number means what, but 0 is plain)
 12. simple date format pattern representing the format for the TrayIcons toolstip text
 
-The load and save routines are only rudimentary, so you might crash TimeTray if you set illegal values. In doubt, delete .timetray in your home directory. TimeTray will then reset the file if neccessary.
+The load and save routines are only rudimentary, so you might crash TimeTray if you set illegal values. In doubt, delete .timetray in your home directory. TimeTray will then reset the file if neccessary. The ugly routines should probably be improved...
 
-I might as well play with a wrapper like [launch4j](http://launch4j.sourceforge.net/ "launch4j") to create a Windows native executable that includes a Runtime Environment, but that's not my priority and that would bloat the file massively.. So, you might do that on your own as well ;-)
+_When will all this be done? When it's done. But to be honest: I don't care much about this piece of code that's probably mainly used for Windows. Sorry! But you may use the source, Luke!_
 
-_When will that be done? When it's done. But to be honest: I don't care much about this piece of code that's probably mainly used for Windows. Sorry!_
-
-## license
-TimeTray is licensed under the DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE.
+## License
+TimeTray is licensed under the [DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE](http://www.wtfpl.net).
