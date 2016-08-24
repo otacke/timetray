@@ -12,7 +12,7 @@ Just make sure that you're running a Java Runtime Environment (e. g. the [JRE fr
 ## Additional Information
 TimeTray is a very simple program that I originally hacked on one day for a former colleague of mine many years ago. It displays the calender week in a system tray -- a feature that Windows still lacks in 2016. Since TimeTray is written in Java, it can run on other operating systems as well, e.g. Linux or MacOS.
 
-TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I don't use Windows. Anyway, allowing to set (and save) some parameters would be useful:
+TimeTray is totally working -- I hope ;-) I cannot test it on Windows because I don't use Windows. So, if you detect a problem, just tell me, please. Anyway, allowing to set (and save) some parameters would be useful:
 
 * the tray icon's background color
 * the tray icon's font color
