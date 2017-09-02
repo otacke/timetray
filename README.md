@@ -1,6 +1,9 @@
 # TimeTray
 TimeTray displays the current calender week in a system tray -- a feature that Windows still lacks in 2016.
 
+## Support me at patreon!
+If you like what I do, please consider to become my supporter at patreon: https://www.patreon.com/otacke
+
 ## Install/Usage
 If you don't use the "Download ZIP" option but only want to download _TimeTray.jar_, **don't right-click it in the list (!) but left-click on it and get the "RAW" version**!
 
